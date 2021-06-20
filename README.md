@@ -1,4 +1,4 @@
-# logo_detection.
+# Logo Detection.
 
 We implemented Logo_detector model using CNN.
 
