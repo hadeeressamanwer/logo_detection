@@ -1,6 +1,6 @@
 # Logo Detection.
 
-We implemented Logo_detector model using CNN.
+We implemented Logo_detector model using CNN. The trained Model will be found in Logo_Detection.ipynb.
 
 # The Training Model Will Be Found In Training_Model.ipynb.
 
