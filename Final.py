@@ -1,32 +1,34 @@
 import PIL.Image
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
+from PIL import ImageTk
+
 from tkinter import *
 import tkinter
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 import cv2
 
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
+
 # Importing keras and its deep learning tools - neural network model, layers, contraints, optimizers, callbacks and utilities
-from keras.models import Sequential
-from keras.layers import Activation, Dense, Dropout, Flatten
-from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras.constraints import maxnorm
-from keras.optimizers import RMSprop, SGD 
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Activation, Dense, Dropout, Flatten
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.optimizers import  RMSprop, SGD
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.utils import np_utils
 from keras.regularizers import l2
 from keras.initializers import RandomNormal, VarianceScaling
-
+import natsort
 # Importing scikit-learn tools
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
-#catagory = 'cars' 'football_clubs'
-#catagory = 'football_clubs'
+
+
 
 
 cars = ['Alfa Romeo', 'Audi', 'BMW', 'Chevrolet', 'Citroen', 'Dacia', 'Daewoo', 'Dodge',
@@ -35,7 +37,7 @@ cars = ['Alfa Romeo', 'Audi', 'BMW', 'Chevrolet', 'Citroen', 'Dacia', 'Daewoo', 
         'Nissan', 'Opel', 'Peugeot', 'Porsche', 'Renault', 'Rover', 'Saab', 'Seat',
         'Skoda', 'Subaru', 'Suzuki', 'Tata', 'Tesla', 'Toyota', 'Volkswagen', 'Volvo']
 football_clubs=['Barcelona', 'Real Madrid', 'Manchester United', 'Borussia Dortmund','Inter Milan', 'Chelsea']
-description = ['German','Italy','Egypt','spain']
+
 
 
 
@@ -103,28 +105,58 @@ def main():
     elif catagory == 'football_clubs':
         model.add(Dense(len(football_clubs), activation='softmax'))
     if catagory == 'cars':
-        model.load_weights('D:\College\ImageProcessing\projectCode\car.h5py')
+        model.load_weights('car.h5py')
     elif catagory == 'football_clubs':
-        model.load_weights('D:\College\ImageProcessing\projectCode\images\Clubimages/football.h5py')
+        model.load_weights('football.h5py')
     
    
-    print(filename+'done')
+    
     im = PIL.Image.open(filename).convert("RGB")
     new_im = np.array(im.resize((img_x,img_y))).flatten()
     filtered_image = cv2.medianBlur(new_im, 7)
     m = int(model.predict_classes(ImageConvert(1, filtered_image,img_x,img_y), verbose=0))
-    #txt = 'Made in ' + description[m]
-    #plt.text(0, 60,txt , ha='center',fontsize=15,backgroundcolor = 'black',color = 'white',fontstyle =  'oblique')
-    plt.imshow(new_im.reshape(img_x, img_y, 3))
-    print(m)
-    if catagory == 'cars':
-        plt.title('Predicted brand: '+cars[m], size=24)
-    elif catagory == 'football_clubs':
-        plt.title('Predicted brand: '+football_clubs[m], size=24)
 
-    #print(description[m])
+    if catagory == 'cars':
+        root = tkinter.Toplevel()
+        root.title("OUTPUT")
+        root.geometry('500x500')
+        canvas = Canvas(root, width = 300, height = 500)
+        canvas.pack()
+        image = PIL.Image.open(filename)
+        img = ImageTk.PhotoImage(image)
+        width, height = image.size
+        print (width)
+        print(height)
+        im=img
+        if width < 100 :
+           im = img._PhotoImage__photo.zoom(3)
         
-    plt.show()
+
+        canvas.create_image(150, 150, anchor=NW, image=im)
+        name=StringVar()
+        lbl3=Label(canvas,textvariable=name,font=("Arial Bold", 10 ),fg="black")
+        lbl4=Label(canvas,text="The Predicted brand:",font=("Arial Bold", 10 ),fg="black")
+        lbl3.place(x=140, y=400)
+        lbl4.place(x=0, y=400)
+        name.set(cars[m])
+        root.mainloop()
+
+    elif catagory == 'football_clubs':
+        root = tkinter.Toplevel()
+        root.title("OUTPUT")
+        root.geometry('500x500')
+        canvas = Canvas(root, width = 300, height = 500)
+        canvas.pack()
+        img = ImageTk.PhotoImage(PIL.Image.open(filename))
+        canvas.create_image(20, 20, anchor=NW, image=img)
+        name=StringVar()
+        lbl3=Label(canvas,textvariable=name,font=("Arial Bold", 10 ),fg="black")
+        lbl4=Label(canvas,text="The Predicted brand:",font=("Arial Bold", 10 ),fg="black")
+        lbl3.place(x=140, y=400)
+        lbl4.place(x=0, y=400)
+        name.set(football_clubs[m])
+        root.mainloop()
+                
 
 def clicked_button1():
     global filename
@@ -137,11 +169,11 @@ def clicked_button2():
 
 
 
+
 window = Tk()
 window.title("LOGO DETECTOR")
-#window.wm_iconbitmap('f.ico')
 window.geometry('650x500')
-lbl = Label(window, text="Choose the Log you want to detect",font=("Arial Bold", 10 ),bg="blue",fg="white", pady=5,  height=2, width=30)
+lbl = Label(window, text="Choose the Logo you want to detect",font=("Arial Bold", 10 ),bg="blue",fg="white", pady=5,  height=2, width=30)
 combo =ttk.Combobox(window)
 lbl2=Label(window,text="choose the category you want to search" )
 combo['values']= ("Choose category","football_clubs", "cars")
@@ -156,6 +188,4 @@ lbl.grid(column=1, row=1)
 lbl2.grid(column=0 , row=20)
 
 window.mainloop()
-
-# Importing standard ML set - numpy, pandas, matplotlib
 
